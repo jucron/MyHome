@@ -1,27 +1,30 @@
 package helpers;
 
-import com.myhome.configuration.properties.mail.EmailTemplateLocalizationProperties;
-import com.myhome.configuration.properties.mail.EmailTemplateProperties;
 import com.myhome.configuration.properties.mail.MailProperties;
+import com.myhome.controllers.dto.PaymentDto;
+import com.myhome.controllers.dto.UserDto;
 import com.myhome.domain.Amenity;
 import com.myhome.domain.Community;
 import com.myhome.domain.CommunityHouse;
 import com.myhome.domain.HouseMember;
+import com.myhome.domain.Payment;
 import com.myhome.domain.User;
-
-import javax.imageio.ImageIO;
+import com.myhome.model.HouseMemberDto;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.imageio.ImageIO;
 
-import static helpers.TestUtils.General.generateUniqueId;
 import static helpers.TestUtils.CommunityHouseHelpers.getTestHouses;
+import static helpers.TestUtils.General.generateUniqueId;
 import static helpers.TestUtils.UserHelpers.getTestUsers;
 
 public class TestUtils {
@@ -76,6 +79,11 @@ public class TestUtils {
           )
           .limit(count)
           .collect(Collectors.toSet());
+    }
+    public static HouseMember getTestHouseMember() {
+      return new HouseMember()
+              .withMemberId(generateUniqueId())
+              .withName("default-house-member-name");
     }
   }
 
@@ -173,7 +181,7 @@ public class TestUtils {
     public static MailProperties getTestMailProperties() {
       MailProperties testMailProperties = new MailProperties();
       testMailProperties.setHost("test host");
-      testMailProperties.setUsername("test username");
+      testMailProperties.setUsername("testUsername");
       testMailProperties.setPassword("test password");
       testMailProperties.setPort(0);
       testMailProperties.setProtocol("test protocol");
@@ -182,23 +190,33 @@ public class TestUtils {
       return testMailProperties;
     }
 
-    public static EmailTemplateProperties getTestMailTemplateProperties() {
-      EmailTemplateProperties testMailTemplate = new EmailTemplateProperties();
-      testMailTemplate.setPath("test path");
-      testMailTemplate.setEncoding("test encoding");
-      testMailTemplate.setMode("test mode");
-      testMailTemplate.setCache(false);
-      return testMailTemplate;
-    }
-
-    public static EmailTemplateLocalizationProperties getTestLocalizationMailProperties() {
-      EmailTemplateLocalizationProperties testTemplatesLocalization = new EmailTemplateLocalizationProperties();
-      testTemplatesLocalization.setPath("test path");
-      testTemplatesLocalization.setEncoding("test encodig");
-      testTemplatesLocalization.setCacheSeconds(0);
-      return testTemplatesLocalization;
-    }
   }
 
+  public static class PaymentHelpers {
 
+    public static PaymentDto getTestPaymentDto(BigDecimal charge, String type, String description, boolean recurring, LocalDate dueDate, UserDto admin, HouseMemberDto member) {
+
+      return PaymentDto.builder()
+          .charge(charge)
+          .type(type)
+          .description(description)
+          .recurring(recurring)
+          .dueDate(dueDate.toString())
+          .admin(admin)
+          .member(member)
+          .build();
+    }
+    public static Payment getTestPaymentNullFields() {
+      //Only 'recurring' field will be not null, but false
+      return new Payment(
+          null,
+          null,
+          null,
+          null,
+          false,
+          null,
+          null,
+          null);
+    }
+  }
 }
